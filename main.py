@@ -35,6 +35,5 @@ for _i in range(ITERS):  # the loop itself is part of the trigger (no loop, no c
     # the walrus writes cur inside the slice (+2); +14 here -> 16 bytes per record
     v = struct.unpack('<H', data[cur:(cur := cur + 2)])[0]
     cur += 14
-cur += 80               # trailing bytes, never read (kept so the end offset matches the original layout)
 
 print(f"OK iters={ITERS} cur={cur} file={len(data)}")
