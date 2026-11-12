@@ -43,10 +43,9 @@ Re-confirmed hands-on (2026-11-12): with the 28-byte header dropped and `cur = 0
 the compiled binary does not crash; restoring the full 286 bytes and `cur = 28`
 brings the deterministic crash back.
 
-**Current revision**: the first data byte has been dropped and `cur = 27`, so
-the loop reads exactly the same bytes as the crashing version, at a shifted
-offset. This tests whether *any* non-zero initial offset triggers the crash
-(not just 28).
+**Current revision**: the smallest crashing form found -- 27 leading data bytes
+dropped (286 -> 259) and `cur = 1`. Every non-zero initial offset crashes
+(1, 2, 27, 28, all 5/5); `cur = 0` does not.
 
 ## Controls
 
@@ -61,11 +60,17 @@ via a `WALRUS` env var; the current file is pinned to the walrus path.
 | `records` counter removed | still crashes |
 | first 28 bytes of data dropped, `cur = 0` | no crash |
 | data unchanged, only `cur` changed from 28 to 0 | no crash |
+| first 1 byte dropped, `cur = 27` | still crashes (5/5) |
+| first 26 bytes dropped, `cur = 2` | still crashes (5/5) |
+| first 27 bytes dropped, `cur = 1` | still crashes (5/5) |
 
-The last two rows show that the *initial offset 28 itself* is part of the
-trigger, not the "skip the header" semantics: data length and content are not
-the key. Keep `cur = 28` and the full 286 bytes -- do not drop the header just
-to "simplify" the file.
+The offset rows bracket the boundary exactly: **every non-zero initial offset
+crashes (28, 27, 2, 1), only `cur = 0` is safe**, regardless of how much data
+was dropped in front. It is not the "skip the header" semantics nor the value
+28 itself -- most likely Nuitka compiles "slice starting at constant 0" through
+a different (specialised) path than "slice starting at a non-zero constant".
+Keep `cur` non-zero and the original data -- do not "simplify" the file into
+the non-crashing form.
 
 ## How to run
 
