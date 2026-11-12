@@ -9,7 +9,8 @@ cd "$(dirname "$0")" || exit 1
 
 # 2. Compile (expected: the binary segfaults at iteration 17)
 .venv/bin/python -m nuitka \
-    --mode=standalone --lto=no --assume-yes-for-downloads \
+    --mode=standalone \
+     --lto=no --assume-yes-for-downloads \
     --output-dir=dist main.py
 
 # 3. Run the binary (expected exit=139)
