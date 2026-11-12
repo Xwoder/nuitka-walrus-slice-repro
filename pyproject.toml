@@ -1,0 +1,22 @@
+[project]
+name = "nuitkawalrusprobe"
+version = "0.1.0"
+description = "Minimal reproducer for a Nuitka heap corruption bug (walrus in slice + numpy)"
+readme = "README.md"
+authors = [
+    { name = "Xwoder", email = "Xwoder@qq.com" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "numpy>=2.5.4",
+]
+
+# Not an installable package: the probe is a plain root-level script, there is
+# no src/<name>/ module for a build backend to package.
+[tool.uv]
+package = false
+
+[dependency-groups]
+dev = [
+    "nuitka[all] @ git+https://github.com/Nuitka/Nuitka.git@develop",
+]
