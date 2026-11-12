@@ -75,7 +75,7 @@ the non-crashing form.
 ## How to run
 
 ```bash
-./test_main.sh            # source run, build, then run the binary
+./build.sh                # source run, build, then run the binary
 ```
 
 Manual steps:
@@ -98,7 +98,7 @@ Manual steps:
 
 | Case | exit code |
 |---|---|
-| source | 0 (prints `OK iters=17 cur=300 file=286`) |
+| source | 0 (prints `OK iters=17 cur=273 file=259`) |
 | binary, `ITERS=17` | 139 (segfault, 5/5 deterministic, no output) |
 | binary, `ITERS=16` | 0 (5/5, verified with a separate copy) |
 | binary, control variant (`WALRUS=0` env, earlier revision) | 0 (5/5) |

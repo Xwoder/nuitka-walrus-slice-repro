@@ -12,7 +12,7 @@ Current revision: back to the walrus form (the walrus-free control experiment
 was run and did not crash, as expected). Smallest crashing form found:
 259-byte data (27 leading bytes dropped), cur = 1, 17 iterations -- every
 non-zero initial offset crashes (1, 2, 27, 28 all verified), cur = 0 does NOT
-crash (see README.md, Controls). ./test_main.sh runs the source, builds the
+crash (see README.md, Controls). ./build.sh runs the source, builds the
 binary and runs it.
 """
 
