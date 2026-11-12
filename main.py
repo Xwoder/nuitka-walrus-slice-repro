@@ -6,17 +6,16 @@ together with an `import numpy` in the module (no numpy API needs to be called)
 and a non-zero initial offset in cur: the compiled binary segfaults (exit=139)
 from 17 iterations on, while CPython runs the very same source normally.
 
-WALRUS=0 in the environment switches to the control variant without the walrus
-(no crash). See README.md for the full trigger analysis and measured results;
-./test_main.sh runs the source, builds the binary and runs both settings.
+This file is pinned to the walrus path; the env-switched control variant was
+removed after the experiments (see README.md for the full trigger analysis,
+control experiments and measured results). ./test_main.sh runs the source,
+builds the binary and runs it.
 """
 
-import os
 import struct
 
 import numpy  # noqa: F401  importing numpy is required for the repro (API not called)
 
-WALRUS = os.environ.get("WALRUS", "1") == "1"
 ITERS = 17              # smallest crashing threshold measured (16 fine, 17 crashes)
 
 # 286 bytes of arbitrary content (only the total length and the offsets matter)
@@ -33,12 +32,9 @@ data = bytes.fromhex(
 )
 cur = 28                # non-zero initial offset (28 bytes skipped); 0 would not crash -- part of the trigger
 for _i in range(ITERS):  # the loop itself is part of the trigger (no loop, no crash)
-    if WALRUS:
-        v = struct.unpack('<H', data[cur:(cur := cur + 2)])[0]
-        cur += 14
-    else:
-        v = struct.unpack('<H', data[cur:cur + 2])[0]
-        cur += 16
+    # the walrus writes cur inside the slice (+2); +14 here -> 16 bytes per record
+    v = struct.unpack('<H', data[cur:(cur := cur + 2)])[0]
+    cur += 14
 cur += 80               # trailing bytes, never read (kept so the end offset matches the original layout)
 
-print(f"OK walrus={WALRUS} iters={ITERS} cur={cur} file={len(data)}")
+print(f"OK iters={ITERS} cur={cur} file={len(data)}")

@@ -41,6 +41,9 @@ Boundary: 16 iterations are fine, 17 iterations deterministically crash
 
 ## Controls
 
+Run against earlier revisions of `main.py` that switched the variant at runtime
+via a `WALRUS` env var; the current file is pinned to the walrus path.
+
 | Variant | Result |
 |---|---|
 | `WALRUS=0` (plain slice, two statements) | no crash |
@@ -58,15 +61,14 @@ to "simplify" the file.
 ## How to run
 
 ```bash
-./test_main.sh            # source run, build, then both WALRUS settings
+./test_main.sh            # source run, build, then run the binary
 ```
 
 Manual steps:
 
 ```bash
 # 1. Run from source (expected: fine, prints OK)
-WALRUS=1 .venv/bin/python main.py
-WALRUS=0 .venv/bin/python main.py
+.venv/bin/python main.py
 
 # 2. Compile with Nuitka (the binary segfaults at iteration 17; needs a C
 #    compiler, takes about a minute)
@@ -74,37 +76,33 @@ WALRUS=0 .venv/bin/python main.py
     --mode=standalone --lto=no --assume-yes-for-downloads \
     --output-dir=dist main.py
 
-# 3. Run the binary (expected exit=139)
-WALRUS=1 ./dist/main.dist/main.bin; echo "exit=$?"
-
-# 4. Control switch (no walrus: the binary is fine, exit=0)
-WALRUS=0 ./dist/main.dist/main.bin; echo "exit=$?"
+# 3. Run the binary (expected exit=139, no output)
+./dist/main.dist/main.bin; echo "exit=$?"
 ```
 
 ## Measured results
 
 | Case | exit code |
 |---|---|
-| source, `WALRUS=1` and `WALRUS=0` | 0 (prints `OK walrus=... iters=17 cur=380 file=286`) |
-| binary, `WALRUS=1`, `ITERS=17` | 139 (segfault, 5/5 deterministic, no output) |
-| binary, `WALRUS=1`, `ITERS=16` | 0 (5/5, verified with a separate copy) |
-| binary, `WALRUS=0` | 0 (5/5, prints `OK walrus=False iters=17 cur=380 file=286`) |
-| binary, `WALRUS=1`, no `import numpy` | 0 (5/5) |
-| binary, `WALRUS=1`, no `records` counter | 139 (5/5) |
-| binary, `WALRUS=1`, first 28 bytes dropped + `cur = 0` | 0 (5/5) |
+| source | 0 (prints `OK iters=17 cur=380 file=286`) |
+| binary, `ITERS=17` | 139 (segfault, 5/5 deterministic, no output) |
+| binary, `ITERS=16` | 0 (5/5, verified with a separate copy) |
+| binary, control variant (`WALRUS=0` env, earlier revision) | 0 (5/5) |
+| binary, no `import numpy` | 0 (5/5) |
+| binary, no `records` counter | 139 (5/5) |
+| binary, first 28 bytes dropped + `cur = 0` | 0 (5/5) |
 
 Side notes from an earlier repository, not re-verified here: compiling the
 walrus variant without the loop (a single direct unpack) does not crash, i.e.
 the loop structure participates in the trigger.
 
 Re-tested with the Nuitka `develop` branch (4.4rc6, commit 7759b7c4, fetched
-2026-11-12): still crashes -- `WALRUS=1` exit=139 5/5, `WALRUS=0` exit=0 3/3.
-Not fixed as of that revision.
+2026-11-12): still crashes -- exit=139 5/5. Not fixed as of that revision.
 
 ## Notes
 
 - After changing the source you must recompile before testing; running an old
   `dist/` binary only reflects the old code.
-- The probe reads `<H` little-endian values; `cur += 14` (walrus branch) and
-  `cur += 16` (control branch) both advance the offset by 16 bytes per record,
-  so both variants read the same bytes and print the same `cur=380`.
+- The probe reads `<H` little-endian values; the walrus writes `cur` inside the
+  slice (+2) and `cur += 14` follows, so the offset advances by 16 bytes per
+  record (the removed control branch used a plain slice and `cur += 16`).
