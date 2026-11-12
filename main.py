@@ -14,7 +14,7 @@ builds the binary and runs it.
 
 import struct
 
-import numpy  # noqa: F401  importing numpy is required for the repro (API not called)
+import numpy as np  # noqa: F401  importing numpy is required for the repro (API not called)
 
 ITERS = 17              # smallest crashing threshold measured (16 fine, 17 crashes)
 
