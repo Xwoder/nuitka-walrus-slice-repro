@@ -16,7 +16,10 @@ dependencies = [
 [tool.uv]
 package = false
 
+[tool.uv.sources]
+nuitka = { git = "https://github.com/Nuitka/Nuitka.git", rev = "develop" }
+
 [dependency-groups]
 dev = [
-    "nuitka[all] @ git+https://github.com/Nuitka/Nuitka.git@develop",
+    "nuitka[all]",
 ]
