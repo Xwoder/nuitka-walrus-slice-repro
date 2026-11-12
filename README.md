@@ -1,11 +1,13 @@
 # Nuitka heap-corruption reproducer (walrus in a slice + `import numpy`)
 
 Minimal, single-file reproducer for a heap corruption bug in binaries compiled
-with **Nuitka 4.3.5**. `main.py` is self-contained (286 bytes of embedded data),
+with **Nuitka `develop` (reports itself as 4.4rc6, commit 7759b7c4)**.
+`main.py` is self-contained (286 bytes of embedded data),
 no external input files are needed.
 
 Measured on 2026-11-12 with Python 3.13.18 (python-build-standalone), Nuitka
-4.3.5 and numpy 2.5.4, compiled as
+`develop` (4.4rc6, commit 7759b7c4; the stable release at that time was 4.3.5,
+but it was not used here) and numpy 2.5.4, compiled as
 `--mode=standalone --lto=no --assume-yes-for-downloads`.
 
 ## Symptom
@@ -43,8 +45,7 @@ Re-confirmed hands-on (2026-11-12): with the 28-byte header dropped and `cur = 0
 the compiled binary does not crash; restoring the full 286 bytes and `cur = 28`
 brings the deterministic crash back.
 
-**Current revision**: the smallest crashing form found -- 27 leading data bytes
-dropped (286 -> 259) and `cur = 1`. Every non-zero initial offset crashes
+**Current revision**: `cur = 1`. Every non-zero initial offset crashes
 (1, 2, 27, 28, all 5/5); `cur = 0` does not.
 
 ## Controls
@@ -111,8 +112,10 @@ Side notes from an earlier repository, not re-verified here: compiling the
 walrus variant without the loop (a single direct unpack) does not crash, i.e.
 the loop structure participates in the trigger.
 
-Re-tested with the Nuitka `develop` branch (4.4rc6, commit 7759b7c4, fetched
-2026-11-12): still crashes -- exit=139 5/5. Not fixed as of that revision.
+All compilations in this repository used the Nuitka `develop` branch (4.4rc6,
+commit 7759b7c4, fetched 2026-11-12): still crashes -- exit=139 5/5. Not fixed
+as of that revision. (Note: the stable release at the time was 4.3.5, which
+Nuitka prints in its update-status output; it was never used to compile here.)
 
 ## Notes
 

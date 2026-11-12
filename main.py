@@ -1,4 +1,5 @@
-"""Reproduction playground for a Nuitka 4.3.5 heap corruption bug.
+"""Reproduction playground for a Nuitka heap corruption bug (develop branch,
+reports itself as 4.4rc6, commit 7759b7c4).
 
 The known trigger is a loop-carried offset used in a slice as a walrus
 expression
@@ -9,8 +10,7 @@ segfaults (exit=139) from 17 iterations on, while CPython runs the same source
 normally.
 
 Current revision: back to the walrus form (the walrus-free control experiment
-was run and did not crash, as expected). Smallest crashing form found:
-259-byte data (27 leading bytes dropped), cur = 1, 17 iterations -- every
+was run and did not crash, as expected). cur = 1, 17 iterations -- every
 non-zero initial offset crashes (1, 2, 27, 28 all verified), cur = 0 does NOT
 crash (see README.md, Controls). ./build.sh runs the source, builds the
 binary and runs it.
@@ -22,8 +22,7 @@ import numpy as np  # noqa: F401  importing numpy is required for the repro (API
 
 ITERS = 17              # smallest crashing threshold measured (16 fine, 17 crashes)
 
-# 259 bytes of arbitrary content (original 286 minus 27 leading bytes; only
-# the total length and the offsets matter)
+# 259 bytes of arbitrary content (only the total length and the offsets matter)
 data = bytes.fromhex(
     "02784f000ca5190058082400599e0f005a794f000ca4190058072400599e0f00"
     "5a7a4f000ca3190058062400599d0f005a7b4f000ca2190058052400599d0f00"
@@ -35,7 +34,7 @@ data = bytes.fromhex(
     "5a864f000ca1190058ff230059960f005a874f000ca1190058fe230059950f00"
     "5a884f"
 )
-cur = 1                 # smallest non-zero offset: 27 leading bytes dropped, one left so cur != 0 (cur = 0 does NOT crash)
+cur = 1                 # non-zero initial offset: required for the crash (cur = 0 does NOT crash)
 for _i in range(ITERS):  # the loop itself is part of the trigger (no loop, no crash)
     # the walrus writes cur inside the slice (+2); +14 here -> 16 bytes per record
     v = struct.unpack('<H', data[cur:(cur := cur + 2)])[0]
