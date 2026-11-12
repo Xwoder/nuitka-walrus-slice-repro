@@ -8,10 +8,12 @@ initial offset in cur (28 in the original layout): the compiled binary then
 segfaults (exit=139) from 17 iterations on, while CPython runs the same source
 normally.
 
-Current revision keeps the smallest crashing form found: 27 leading data
-bytes dropped and cur = 1. Every non-zero initial offset crashes (1, 2, 27,
-28 all verified 5/5); cur = 0 does NOT crash (see README.md, Controls).
-./test_main.sh runs the source, builds the binary and runs it.
+Current revision: back to the walrus form (the walrus-free control experiment
+was run and did not crash, as expected). Smallest crashing form found:
+259-byte data (27 leading bytes dropped), cur = 1, 17 iterations -- every
+non-zero initial offset crashes (1, 2, 27, 28 all verified), cur = 0 does NOT
+crash (see README.md, Controls). ./test_main.sh runs the source, builds the
+binary and runs it.
 """
 
 import struct
