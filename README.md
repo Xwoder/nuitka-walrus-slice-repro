@@ -39,6 +39,15 @@ All three ingredients are required:
 Boundary: 16 iterations are fine, 17 iterations deterministically crash
 (bisected). `main.py` is pinned at 17.
 
+Re-confirmed hands-on (2026-11-12): with the 28-byte header dropped and `cur = 0`
+the compiled binary does not crash; restoring the full 286 bytes and `cur = 28`
+brings the deterministic crash back.
+
+**Current revision**: the first data byte has been dropped and `cur = 27`, so
+the loop reads exactly the same bytes as the crashing version, at a shifted
+offset. This tests whether *any* non-zero initial offset triggers the crash
+(not just 28).
+
 ## Controls
 
 Run against earlier revisions of `main.py` that switched the variant at runtime
