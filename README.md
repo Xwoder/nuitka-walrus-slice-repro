@@ -84,13 +84,14 @@ Manual steps:
 
 | Case | exit code |
 |---|---|
-| source | 0 (prints `OK iters=17 cur=380 file=286`) |
+| source | 0 (prints `OK iters=17 cur=300 file=286`) |
 | binary, `ITERS=17` | 139 (segfault, 5/5 deterministic, no output) |
 | binary, `ITERS=16` | 0 (5/5, verified with a separate copy) |
 | binary, control variant (`WALRUS=0` env, earlier revision) | 0 (5/5) |
 | binary, no `import numpy` | 0 (5/5) |
 | binary, no `records` counter | 139 (5/5) |
 | binary, first 28 bytes dropped + `cur = 0` | 0 (5/5) |
+| binary, `cur += 80` tail removed | 139 (5/5, removed from the file) |
 
 Side notes from an earlier repository, not re-verified here: compiling the
 walrus variant without the loop (a single direct unpack) does not crash, i.e.
