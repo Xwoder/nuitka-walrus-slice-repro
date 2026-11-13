@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 5
 requires-python = ">=3.13"
 
 [[package]]
@@ -18,7 +18,7 @@ wheels = [
 [[package]]
 name = "nuitka"
 version = "4.4rc6"
-source = { git = "https://github.com/Nuitka/Nuitka.git?rev=develop#7759b7c48636953cdf970d887dc97a1eab711173" }
+source = { git = "https://github.com/Nuitka/Nuitka.git?rev=factory#3be3362388b742f66ebc138b19edc5ea200938c6" }
 
 [package.optional-dependencies]
 all = [
@@ -45,7 +45,7 @@ dev = [
 requires-dist = [{ name = "numpy", specifier = ">=2.5.4" }]
 
 [package.metadata.requires-dev]
-dev = [{ name = "nuitka", extras = ["all"], git = "https://github.com/Nuitka/Nuitka.git?rev=develop" }]
+dev = [{ name = "nuitka", extras = ["all"], git = "https://github.com/Nuitka/Nuitka.git?rev=factory" }]
 
 [[package]]
 name = "numpy"

@@ -17,7 +17,7 @@ dependencies = [
 package = false
 
 [tool.uv.sources]
-nuitka = { git = "https://github.com/Nuitka/Nuitka.git", rev = "develop" }
+nuitka = { git = "https://github.com/Nuitka/Nuitka.git", rev = "factory" }
 
 [dependency-groups]
 dev = [
