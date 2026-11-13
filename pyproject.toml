@@ -3,9 +3,6 @@ name = "nuitkawalrusprobe"
 version = "0.1.0"
 description = "Minimal reproducer for a Nuitka heap corruption bug (walrus in slice + numpy)"
 readme = "README.md"
-authors = [
-    { name = "Xwoder", email = "Xwoder@qq.com" }
-]
 requires-python = ">=3.13"
 dependencies = [
     "numpy>=2.5.4",
